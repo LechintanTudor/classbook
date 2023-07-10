@@ -1,6 +1,7 @@
 package xyz.lechi.classbook.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import xyz.lechi.classbook.exception.EntityNotFound;
 import xyz.lechi.classbook.model.Grade;
@@ -13,20 +14,11 @@ import xyz.lechi.classbook.repository.SubjectRepository;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class GradeService {
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
     private final GradeRepository gradeRepository;
-
-    public GradeService(
-        StudentRepository studentRepository,
-        SubjectRepository subjectRepository,
-        GradeRepository gradeRepository
-    ) {
-        this.studentRepository = studentRepository;
-        this.subjectRepository = subjectRepository;
-        this.gradeRepository = gradeRepository;
-    }
 
     @Transactional
     public Grade addGrade(Long studentId, Long subjectId, int points) {

@@ -1,5 +1,6 @@
 package xyz.lechi.classbook.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import xyz.lechi.classbook.model.Student;
 import xyz.lechi.classbook.repository.StudentRepository;
@@ -8,12 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class StudentService {
     private final StudentRepository studentRepository;
-
-    public StudentService(StudentRepository studentRepository) {
-        this.studentRepository = studentRepository;
-    }
 
     public Student addStudent(Student student) {
         return studentRepository.save(student);

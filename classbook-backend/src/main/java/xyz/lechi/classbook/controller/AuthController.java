@@ -1,42 +1,26 @@
 package xyz.lechi.classbook.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import xyz.lechi.classbook.dto.LogInDto;
 import xyz.lechi.classbook.dto.RegisterDto;
 import xyz.lechi.classbook.dto.TokenDto;
 import xyz.lechi.classbook.dto.UserDto;
-import xyz.lechi.classbook.dto.mapper.UserMapper;
-import xyz.lechi.classbook.service.UserService;
+import xyz.lechi.classbook.service.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
-    private final UserService userService;
-    private final UserMapper userMapper;
-
-    public AuthController(UserService userService, UserMapper userMapper) {
-        this.userService = userService;
-        this.userMapper = userMapper;
-    }
+    private final AuthService authService;
 
     @PostMapping("/register")
     public UserDto register(@RequestBody RegisterDto registerDto) {
-        var user = userMapper.fromRegisterDto(registerDto);
-        user = userService.addUser(user);
-        return userMapper.toDto(user);
+        return authService.register(registerDto);
     }
 
     @PostMapping("/login")
-    public TokenDto login() {
-        return null;
-    }
-
-    @GetMapping
-    public void loginStatus() {
-
-    }
-
-    @PostMapping("/logout")
-    public void logout() {
-
+    public TokenDto logIn(@RequestBody LogInDto logInDto) {
+        return authService.logIn(logInDto);
     }
 }
