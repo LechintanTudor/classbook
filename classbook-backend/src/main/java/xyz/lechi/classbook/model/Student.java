@@ -24,5 +24,6 @@ public class Student {
     private String lastName;
 
     @OneToMany(mappedBy = "student")
+    @Builder.Default
     private Set<Grade> grades = new HashSet<>();
 }
