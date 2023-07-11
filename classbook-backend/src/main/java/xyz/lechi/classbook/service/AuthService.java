@@ -10,15 +10,20 @@ import xyz.lechi.classbook.dto.RegisterDto;
 import xyz.lechi.classbook.dto.TokenDto;
 import xyz.lechi.classbook.dto.UserDto;
 import xyz.lechi.classbook.dto.mapper.UserMapper;
+import xyz.lechi.classbook.exception.EntityNotFound;
+import xyz.lechi.classbook.model.JwtToken;
+import xyz.lechi.classbook.model.User;
+import xyz.lechi.classbook.repository.JwtTokenRepository;
 import xyz.lechi.classbook.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+    private final JwtTokenRepository jwtTokenRepository;
+    private final JwtTokenService jwtTokenService;
     private final UserMapper userMapper;
     private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
 
     public UserDto register(RegisterDto registerDto) {
         var user = userMapper.fromRegisterDto(registerDto);
@@ -35,6 +40,29 @@ public class AuthService {
             .authenticate(authToken)
             .getPrincipal();
 
-       return new TokenDto(jwtService.createJwt(userDetails));
+        var user = userRepository
+            .findByUsername(userDetails.getUsername())
+            .orElseThrow(() -> new EntityNotFound(User.class));
+
+        var token = jwtTokenService.createJwtToken(userDetails);
+
+        var jwtToken = JwtToken.builder()
+            .user(user)
+            .token(token)
+            .isRevoked(false)
+            .isExpired(false)
+            .build();
+
+        jwtTokenRepository.save(jwtToken);
+        return new TokenDto(token);
+    }
+
+    public void logOut(String token) {
+        var jwtToken = jwtTokenRepository
+            .findByToken(token)
+            .orElseThrow(() -> new EntityNotFound(JwtToken.class));
+
+        jwtToken.setRevoked(true);
+        jwtTokenRepository.save(jwtToken);
     }
 }

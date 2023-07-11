@@ -12,25 +12,27 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import xyz.lechi.classbook.service.JwtService;
+import xyz.lechi.classbook.service.JwtTokenService;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthFilter extends OncePerRequestFilter {
+public class JwtTokenAuthFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final String[] PATHS_TO_SKIP = { "api/auth/register", "/api/auth/login" };
 
-    private final JwtService jwtService;
+    private final JwtTokenService jwtService;
     private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
-        HttpServletRequest request,
+        @NonNull HttpServletRequest request,
         @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (request.getServletPath().startsWith("/api/auth")) {
+        if (Arrays.stream(PATHS_TO_SKIP).anyMatch(path -> request.getServletPath().startsWith(path))) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -48,10 +50,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (jwtService.isTokenValid(token, userDetails)) {
+            if (jwtService.isJwtTokenValid(token, userDetails)) {
                 var authToken = new UsernamePasswordAuthenticationToken(
                     userDetails,
-                    null,
+                    token,
                     userDetails.getAuthorities()
                 );
 

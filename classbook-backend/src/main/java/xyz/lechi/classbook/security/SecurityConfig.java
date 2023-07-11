@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import xyz.lechi.classbook.dto.mapper.UserMapper;
 import xyz.lechi.classbook.repository.UserRepository;
-import xyz.lechi.classbook.service.AuthUserService;
+import xyz.lechi.classbook.service.UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -28,7 +28,7 @@ public class SecurityConfig {
 
     @Bean
     UserDetailsService userDetailsService(UserRepository userRepository, UserMapper userMapper) {
-        return new AuthUserService(userRepository, userMapper);
+        return new UserService(userRepository, userMapper);
     }
 
     @Bean
@@ -51,7 +51,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(
         HttpSecurity httpSecurity,
         AuthenticationProvider authenticationProvider,
-        JwtAuthFilter jwtAuthFilter
+        JwtTokenAuthFilter jwtAuthFilter
     ) throws Exception {
        httpSecurity
            .csrf(AbstractHttpConfigurer::disable)

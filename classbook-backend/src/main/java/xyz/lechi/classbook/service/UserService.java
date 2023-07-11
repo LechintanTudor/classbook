@@ -10,7 +10,7 @@ import xyz.lechi.classbook.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-public class AuthUserService implements UserDetailsService {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 

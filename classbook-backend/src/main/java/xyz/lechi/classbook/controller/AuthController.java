@@ -1,6 +1,7 @@
 package xyz.lechi.classbook.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import xyz.lechi.classbook.dto.LogInDto;
 import xyz.lechi.classbook.dto.RegisterDto;
@@ -22,5 +23,17 @@ public class AuthController {
     @PostMapping("/login")
     public TokenDto logIn(@RequestBody LogInDto logInDto) {
         return authService.logIn(logInDto);
+    }
+
+    @PostMapping("/logout")
+    public void logOut() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            return;
+        }
+
+        var token = (String) authentication.getCredentials();
+        authService.logOut(token);
     }
 }
